@@ -1,0 +1,38 @@
+{
+  "name": "mail-blog",
+  "version": "1.0.0",
+  "description": "Gmail API parser for newsletter extraction",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "tsx src/server.ts",
+    "dev:all": "./script/dev.sh",
+    "dev:cli": "tsx src/cli/sync-emails.ts",
+    "generate:batch": "tsx src/cli/generate-batch.ts",
+    "generate:resume": "tsx src/cli/generate-batch.ts --resume",
+    "fix:articles": "tsx src/cli/fix-article-markup.ts"
+  },
+  "keywords": [
+    "gmail",
+    "parser",
+    "newsletter"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@google/genai": "^2.8.0",
+    "cheerio": "^1.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^4.21.2",
+    "googleapis": "^144.0.0",
+    "gray-matter": "^4.0.3"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
