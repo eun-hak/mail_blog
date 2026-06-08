@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Facebook, Rss, Twitter, Youtube } from "lucide-react";
 import { CATEGORIES } from "../../lib/constants";
 
@@ -23,7 +23,7 @@ export function Footer() {
                 {CATEGORIES.map((c) => (
                   <li key={c.slug}>
                     <Link
-                      to={`/category/${c.slug}`}
+                      href={`/category/${c.slug}`}
                       className="text-[13px] text-[#CCCCCC] hover:text-white"
                     >
                       {c.label}
@@ -38,17 +38,17 @@ export function Footer() {
               </p>
               <ul className="mt-3 space-y-3 text-[13px] text-[#CCCCCC]">
                 <li>
-                  <Link to="/about" className="hover:text-white">
+                  <Link href="/about" className="hover:text-white">
                     소개
                   </Link>
                 </li>
                 <li>
-                  <Link to="/contact" className="hover:text-white">
+                  <Link href="/contact" className="hover:text-white">
                     문의
                   </Link>
                 </li>
                 <li>
-                  <Link to="/subscribe" className="hover:text-white">
+                  <Link href="/subscribe" className="hover:text-white">
                     뉴스레터 구독
                   </Link>
                 </li>
@@ -65,12 +65,12 @@ export function Footer() {
               </p>
               <ul className="mt-3 space-y-3 text-[13px] text-[#CCCCCC]">
                 <li>
-                  <Link to="/privacy" className="hover:text-white">
+                  <Link href="/privacy" className="hover:text-white">
                     개인정보처리방침
                   </Link>
                 </li>
                 <li>
-                  <Link to="/terms" className="hover:text-white">
+                  <Link href="/terms" className="hover:text-white">
                     이용약관
                   </Link>
                 </li>

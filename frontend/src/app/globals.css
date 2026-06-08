@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-surface-primary font-body text-ink-primary antialiased;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-ticker {
+    animation: none;
+  }
+}

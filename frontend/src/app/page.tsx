@@ -1,27 +1,33 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Sparkles } from "lucide-react";
-import { useEmailContext } from "../context/EmailContext";
-import { FeaturedNewsCard } from "../components/ui/FeaturedNewsCard";
-import { NewsCard } from "../components/ui/NewsCard";
-import { SectionHeader } from "../components/ui/SectionHeader";
-import { AdPlaceholder } from "../components/ui/AdPlaceholder";
-import { NewsletterBox } from "../components/ui/NewsletterBox";
-import { EmptyState } from "../components/ui/EmptyState";
+import { getArticles } from "@/lib/articles.server";
+import { FeaturedNewsCard } from "@/components/ui/FeaturedNewsCard";
+import { NewsCard } from "@/components/ui/NewsCard";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { AdPlaceholder } from "@/components/ui/AdPlaceholder";
+import { NewsletterBox } from "@/components/ui/NewsletterBox";
+import { EmptyState } from "@/components/ui/EmptyState";
+import type { Article } from "@/lib/types";
 
-export function HomePage() {
-  const { articles, loading, error } = useEmailContext();
+export default async function HomePage() {
+  let articles: Article[] = [];
 
-  if (loading) {
-    return (
-      <div className="py-24 text-center text-ink-secondary">불러오는 중...</div>
-    );
-  }
-
-  if (error || articles.length === 0) {
+  try {
+    articles = await getArticles();
+  } catch {
     return (
       <EmptyState
         title="뉴스를 불러오지 못했습니다"
-        description={error ?? "데이터를 확인해 주세요."}
+        description="백엔드 API가 실행 중인지 확인해 주세요."
+      />
+    );
+  }
+
+  if (articles.length === 0) {
+    return (
+      <EmptyState
+        title="뉴스를 불러오지 못했습니다"
+        description="데이터를 확인해 주세요."
       />
     );
   }
@@ -115,10 +121,10 @@ function CategorySectionLabel({ label }: { label: string }) {
   );
 }
 
-function CompactRow({ article }: { article: import("../lib/types").Article }) {
+function CompactRow({ article }: { article: Article }) {
   return (
     <Link
-      to={`/article/${article.id}`}
+      href={`/article/${article.id}`}
       className="block rounded-lg border border-border-primary bg-surface-white p-4 hover:border-accent-blue/30"
     >
       <p className="font-heading text-base font-semibold leading-snug text-ink-primary line-clamp-2">

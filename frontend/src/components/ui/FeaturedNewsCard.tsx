@@ -1,7 +1,7 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { CategoryBadge } from "./CategoryBadge";
-import type { Article } from "../../lib/types";
+import type { Article } from "@/lib/types";
 
 type Props = { article: Article };
 
@@ -28,7 +28,7 @@ export function FeaturedNewsCard({ article }: Props) {
           <span>읽는 시간 {article.readMinutes}분</span>
         </div>
         <Link
-          to={`/article/${article.id}`}
+          href={`/article/${article.id}`}
           className="inline-flex w-fit items-center gap-1.5 rounded-md bg-accent-blue px-5 py-2.5 text-sm font-semibold text-white hover:bg-accent-blue-dark"
         >
           자세히 보기

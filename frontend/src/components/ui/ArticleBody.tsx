@@ -1,4 +1,4 @@
-import { parseArticleBlocks } from "../../lib/articleBody";
+import { parseArticleBlocks } from "@/lib/articleBody";
 
 export function ArticleBody({ text }: { text: string }) {
   const blocks = parseArticleBlocks(text);

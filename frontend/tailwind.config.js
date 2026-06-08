@@ -1,6 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  content: [
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
   theme: {
     extend: {
       colors: {
@@ -29,9 +32,9 @@ export default {
         },
       },
       fontFamily: {
-        heading: ['"Newsreader"', "Georgia", "serif"],
-        body: ['"Inter"', "system-ui", "sans-serif"],
-        mono: ['"JetBrains Mono"', "monospace"],
+        heading: ["var(--font-heading)", "Georgia", "serif"],
+        body: ["var(--font-body)", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "monospace"],
       },
       maxWidth: {
         content: "1216px",

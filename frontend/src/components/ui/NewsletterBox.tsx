@@ -1,5 +1,7 @@
+"use client";
+
 import { Mail } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 export function NewsletterBox() {
   return (
@@ -22,7 +24,7 @@ export function NewsletterBox() {
           className="h-11 flex-1 rounded-lg border-0 px-4 text-sm text-ink-primary outline-none"
         />
         <Link
-          to="/subscribe"
+          href="/subscribe"
           className="flex h-11 items-center justify-center rounded-lg bg-[#0D47A1] px-6 text-sm font-semibold text-white hover:bg-[#0a3a85]"
         >
           구독하기

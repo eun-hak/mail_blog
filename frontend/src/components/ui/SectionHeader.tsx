@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 type Props = {
@@ -19,7 +19,7 @@ export function SectionHeader({
       </h2>
       {moreTo && (
         <Link
-          to={moreTo}
+          href={moreTo}
           className="flex items-center gap-1 text-[13px] font-medium text-accent-blue"
         >
           {moreLabel}

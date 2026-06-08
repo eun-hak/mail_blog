@@ -1,7 +1,9 @@
+"use client";
+
 import { useState } from "react";
 import { Send } from "lucide-react";
 
-export function ContactPage() {
+export function ContactPageClient() {
   const [submitted, setSubmitted] = useState(false);
 
   return (
@@ -85,4 +87,3 @@ function Field({
     </div>
   );
 }
-

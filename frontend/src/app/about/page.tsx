@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Mail } from "lucide-react";
 
 const SECTIONS = [
@@ -24,13 +24,13 @@ const SECTIONS = [
   },
 ];
 
-export function AboutPage() {
+export default function AboutPage() {
   return (
     <section className="mx-auto max-w-article px-8 py-12">
       <h1 className="font-heading text-4xl font-bold text-ink-primary">
         NewsBrief 소개
       </h1>
-      <div className="mt-10 space-y-10">
+      <div className="mt-10 space-y-8">
         {SECTIONS.map((s) => (
           <div key={s.title}>
             <h2 className="font-heading text-[22px] font-semibold text-ink-primary">
@@ -41,14 +41,14 @@ export function AboutPage() {
             </p>
           </div>
         ))}
-        <Link
-          to="/contact"
-          className="inline-flex items-center gap-2 rounded-lg bg-accent-blue px-6 py-3 text-[15px] font-semibold text-white hover:bg-accent-blue-dark"
-        >
-          <Mail size={16} />
-          문의하기
-        </Link>
       </div>
+      <Link
+        href="/contact"
+        className="mt-10 inline-flex items-center gap-2 rounded-lg bg-accent-blue px-6 py-3 text-[15px] font-semibold text-white hover:bg-accent-blue-dark"
+      >
+        <Mail size={18} />
+        문의하기
+      </Link>
     </section>
   );
 }

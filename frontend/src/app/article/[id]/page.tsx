@@ -1,28 +1,47 @@
-import { Link, useParams } from "react-router-dom";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { Sparkles } from "lucide-react";
-import { useEmailContext } from "../context/EmailContext";
-import { CategoryBadge } from "../components/ui/CategoryBadge";
-import { ShareButtons } from "../components/ui/ShareButtons";
-import { NewsCard } from "../components/ui/NewsCard";
-import { ArticleBody } from "../components/ui/ArticleBody";
-import { EmptyState } from "../components/ui/EmptyState";
+import { getArticles } from "@/lib/articles.server";
+import { getArticleById } from "@/lib/articles";
+import { CategoryBadge } from "@/components/ui/CategoryBadge";
+import { ShareButtons } from "@/components/ui/ShareButtons";
+import { NewsCard } from "@/components/ui/NewsCard";
+import { ArticleBody } from "@/components/ui/ArticleBody";
 
-export function ArticlePage() {
-  const { id } = useParams<{ id: string }>();
-  const { getById, articles, loading } = useEmailContext();
-  const article = id ? getById(id) : undefined;
+export const dynamic = "force-dynamic";
 
-  if (loading) {
-    return <div className="py-24 text-center text-ink-secondary">불러오는 중...</div>;
+type Props = {
+  params: Promise<{ id: string }>;
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  try {
+    const articles = await getArticles();
+    const article = getArticleById(articles, id);
+    if (!article) return { title: "글을 찾을 수 없습니다" };
+    return {
+      title: article.title,
+      description: article.description,
+      openGraph: {
+        title: article.title,
+        description: article.description,
+        images: [article.imageUrl],
+      },
+    };
+  } catch {
+    return { title: "NewsBrief" };
   }
+}
+
+export default async function ArticlePage({ params }: Props) {
+  const { id } = await params;
+  const articles = await getArticles();
+  const article = getArticleById(articles, id);
 
   if (!article) {
-    return (
-      <EmptyState
-        title="글을 찾을 수 없습니다"
-        description="목록에서 다시 선택해 주세요."
-      />
-    );
+    notFound();
   }
 
   const related = articles
@@ -99,9 +118,7 @@ export function ArticlePage() {
 
       {related.length > 0 && (
         <section className="mt-10">
-          <h2 className="font-heading text-xl font-bold text-black">
-            관련 글
-          </h2>
+          <h2 className="font-heading text-xl font-bold text-black">관련 글</h2>
           <div className="mt-4 grid gap-4 md:grid-cols-3">
             {related.map((a) => (
               <NewsCard key={a.id} article={a} />
@@ -111,7 +128,7 @@ export function ArticlePage() {
       )}
 
       <div className="mt-10">
-        <Link to="/" className="text-sm font-medium text-accent-blue">
+        <Link href="/" className="text-sm font-medium text-accent-blue">
           ← 목록으로
         </Link>
       </div>

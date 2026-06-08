@@ -120,22 +120,27 @@ Google Cloud **OAuth 클라이언트 JSON**을 프로젝트 루트에 `credentia
 
 ## 프론트엔드 (NewsBrief UI)
 
-Pencil 디자인(`../pencil/news_blog.pen`) 기반 React 앱입니다.
+Pencil 디자인(`../pencil/news_blog.pen`) 기반 **Next.js 15 (App Router)** 앱입니다. 홈·글 상세·카테고리·검색 등은 **SSR**로 렌더링됩니다.
 
 ```bash
 cd frontend
+cp .env.example .env   # API 연동 시 NEXT_PUBLIC_USE_MOCK=false
 npm install
-npm run dev    # http://localhost:5173
+npm run dev            # http://localhost:5173
+npm run build && npm run start   # 프로덕션
 ```
 
-**기본은 목업 데이터**로 동작합니다 (`VITE_USE_MOCK=true`). 백엔드 API를 쓰려면 `frontend/.env`에 `VITE_USE_MOCK=false`를 설정하세요.
+**기본은 목업 데이터**로 동작합니다 (`NEXT_PUBLIC_USE_MOCK=true`). 백엔드 API를 쓰려면 `frontend/.env`에 아래처럼 설정하세요.
 
 ```bash
 # frontend/.env
-VITE_USE_MOCK=false
+NEXT_PUBLIC_USE_MOCK=false
+API_URL=http://localhost:3001
 ```
 
-목업 모드에서는 프론트만 단독 실행해도 됩니다. API 연동 시 백엔드가 함께 떠 있어야 하며, Vite proxy가 `/api`를 `localhost:3001`로 전달합니다.
+- `API_URL`: Next **서버**가 SSR fetch 할 때 쓰는 Express 주소
+- `/api/*` 요청은 `next.config.ts` rewrites로 `API_URL` 백엔드에 프록시됩니다
+- 목업 모드에서는 프론트만 단독 실행해도 됩니다. API 연동 시 백엔드가 함께 떠 있어야 합니다
 
 ### 페이지
 

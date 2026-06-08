@@ -1,25 +1,30 @@
+"use client";
+
 import { useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useEmailContext, filterByCategory } from "../context/EmailContext";
-import { CATEGORIES } from "../lib/constants";
-import { FeaturedNewsCard } from "../components/ui/FeaturedNewsCard";
-import { NewsCard } from "../components/ui/NewsCard";
-import { FilterButton } from "../components/ui/FilterButton";
-import { Pagination } from "../components/ui/Pagination";
-import { EmptyState } from "../components/ui/EmptyState";
-import { formatDate } from "../lib/utils";
+import { CATEGORIES } from "@/lib/constants";
+import { filterByCategory } from "@/lib/articles";
+import type { Article, CategorySlug } from "@/lib/types";
+import { FeaturedNewsCard } from "@/components/ui/FeaturedNewsCard";
+import { NewsCard } from "@/components/ui/NewsCard";
+import { FilterButton } from "@/components/ui/FilterButton";
+import { Pagination } from "@/components/ui/Pagination";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { formatDate } from "@/lib/utils";
 
 const PER_PAGE = 6;
 
-export function CategoryPage() {
-  const { slug } = useParams<{ slug: string }>();
-  const { articles, loading } = useEmailContext();
+type Props = {
+  slug: string;
+  articles: Article[];
+};
+
+export function CategoryPageClient({ slug, articles }: Props) {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<"latest" | "popular">("latest");
 
   const category =
     CATEGORIES.find((c) => c.slug === slug) ?? {
-      slug: "economy" as const,
+      slug: "economy" as CategorySlug,
       label: "경제",
       description: "국내외 경제 이슈와 시장 동향을 분석합니다.",
     };
@@ -38,10 +43,6 @@ export function CategoryPage() {
   const totalPages = Math.max(1, Math.ceil(sorted.length / PER_PAGE));
   const paged = sorted.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
-  if (loading) {
-    return <div className="py-24 text-center text-ink-secondary">불러오는 중...</div>;
-  }
-
   return (
     <>
       <section className="mx-auto max-w-content px-8 py-12 text-center">
@@ -52,7 +53,11 @@ export function CategoryPage() {
           {category.description}
         </p>
         <p className="mt-3 font-mono text-[11px] text-ink-tertiary">
-          최신 업데이트: {formatDate(new Date())} {new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })}
+          최신 업데이트: {formatDate(new Date())}{" "}
+          {new Date().toLocaleTimeString("ko-KR", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
         </p>
       </section>
 

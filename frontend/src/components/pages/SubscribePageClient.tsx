@@ -1,7 +1,9 @@
+"use client";
+
 import { useState } from "react";
 import { Mail, CheckCircle2 } from "lucide-react";
 
-export function SubscribePage() {
+export function SubscribePageClient() {
   const [done, setDone] = useState(false);
 
   return (

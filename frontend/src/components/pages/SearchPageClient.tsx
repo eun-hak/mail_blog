@@ -1,15 +1,22 @@
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { Search } from "lucide-react";
-import { useEmailContext, searchArticles } from "../context/EmailContext";
-import { NewsCard } from "../components/ui/NewsCard";
-import { EmptyState } from "../components/ui/EmptyState";
+"use client";
 
-export function SearchPage() {
-  const [params, setParams] = useSearchParams();
-  const query = params.get("q") ?? "";
+import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Search } from "lucide-react";
+import { searchArticles } from "@/lib/articles";
+import type { Article } from "@/lib/types";
+import { NewsCard } from "@/components/ui/NewsCard";
+import { EmptyState } from "@/components/ui/EmptyState";
+
+type Props = {
+  articles: Article[];
+};
+
+export function SearchPageClient({ articles }: Props) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const query = searchParams.get("q") ?? "";
   const [input, setInput] = useState(query);
-  const { articles, loading } = useEmailContext();
 
   const results = useMemo(
     () => searchArticles(articles, query),
@@ -18,14 +25,15 @@ export function SearchPage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setParams(input ? { q: input } : {});
+    const params = new URLSearchParams();
+    if (input.trim()) params.set("q", input.trim());
+    const qs = params.toString();
+    router.replace(qs ? `/search?${qs}` : "/search");
   };
 
   return (
     <section className="mx-auto max-w-content px-8 py-12">
-      <h1 className="font-heading text-4xl font-bold text-ink-primary">
-        검색
-      </h1>
+      <h1 className="font-heading text-4xl font-bold text-ink-primary">검색</h1>
       <p className="mt-3 text-base text-ink-secondary">
         NewsBrief 기사에서 키워드를 검색합니다.
       </p>
@@ -43,9 +51,7 @@ export function SearchPage() {
         />
       </form>
 
-      {loading ? (
-        <p className="mt-12 text-center text-ink-secondary">불러오는 중...</p>
-      ) : query && results.length === 0 ? (
+      {query && results.length === 0 ? (
         <EmptyState />
       ) : (
         <>

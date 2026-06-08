@@ -1,13 +1,13 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { CategoryBadge } from "./CategoryBadge";
-import type { Article } from "../../lib/types";
+import type { Article } from "@/lib/types";
 
 type Props = { article: Article };
 
 export function NewsCard({ article }: Props) {
   return (
     <Link
-      to={`/article/${article.id}`}
+      href={`/article/${article.id}`}
       className="group flex flex-col overflow-hidden rounded-lg border border-border-primary bg-surface-white transition hover:border-accent-blue/30"
     >
       <div className="h-[200px] overflow-hidden bg-[#D0D0D0]">

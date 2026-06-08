@@ -21,7 +21,7 @@ const SECTIONS = [
   },
 ];
 
-export function TermsPage() {
+export default function TermsPage() {
   return (
     <section className="mx-auto max-w-article px-8 py-12">
       <h1 className="font-heading text-4xl font-bold text-ink-primary">
