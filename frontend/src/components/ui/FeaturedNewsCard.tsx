@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { CategoryBadge } from "./CategoryBadge";
+import { ArticleThumbnail } from "./ArticleThumbnail";
 import type { Article } from "@/lib/types";
 
 type Props = { article: Article };
@@ -9,9 +10,8 @@ export function FeaturedNewsCard({ article }: Props) {
   return (
     <div className="grid min-h-[400px] overflow-hidden rounded-xl border border-border-primary bg-surface-white md:grid-cols-2">
       <div className="relative min-h-[240px] bg-[#C0C8D0] md:min-h-full">
-        <img
+        <ArticleThumbnail
           src={article.imageUrl}
-          alt=""
           className="absolute inset-0 h-full w-full object-cover"
         />
       </div>

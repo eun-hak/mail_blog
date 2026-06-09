@@ -17,7 +17,7 @@ categorySlug: economy
 writingStyle: 역사·비유로 풀어내는 설명 — 과거 사례와 오늘을 대비
 date: 2026.06.04
 readMinutes: 4
-imageUrl: 'https://images.unsplash.com/photo-1656428764153-6224cbaa1fe4?w=800&q=80'
+imageUrl: /api/media/images/19e8f273f1b13541-t1.jpg
 marketInfo:
   kospi: '8801.49'
   kosdaq: '1026.03'

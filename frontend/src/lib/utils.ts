@@ -48,11 +48,12 @@ export function estimateReadMinutes(text: string | null): number {
 }
 
 export function pickImage(id: string): string {
-  let hash = 0;
+  let hash = 5381;
   for (let i = 0; i < id.length; i++) {
-    hash = (hash + id.charCodeAt(i)) % PLACEHOLDER_IMAGES.length;
+    hash = (hash * 33) ^ id.charCodeAt(i);
   }
-  return PLACEHOLDER_IMAGES[hash];
+  const index = Math.abs(hash) % PLACEHOLDER_IMAGES.length;
+  return PLACEHOLDER_IMAGES[index];
 }
 
 export function emailToArticle(email: ParsedEmail): Article {

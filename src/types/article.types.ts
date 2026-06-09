@@ -12,6 +12,8 @@ export type GeminiBlogAnalysis = {
   body: string;
   highlights: string[];
   marketInfo: MarketInfo;
+  /** Unsplash 검색용 영어 키워드 (2~4단어) */
+  imageSearchQuery?: string;
 };
 
 export type GeneratedArticle = {
@@ -32,4 +34,6 @@ export type GeneratedArticle = {
   writingStyle: string;
   gmailMessageId: string;
   analyzedAt: string;
+  /** Unsplash 검색에 사용한 영어 키워드 (md frontmatter 저장용) */
+  imageSearchQuery?: string;
 };

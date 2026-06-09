@@ -8,6 +8,7 @@ import { CategoryBadge } from "@/components/ui/CategoryBadge";
 import { ShareButtons } from "@/components/ui/ShareButtons";
 import { NewsCard } from "@/components/ui/NewsCard";
 import { ArticleBody } from "@/components/ui/ArticleBody";
+import { ArticleThumbnail } from "@/components/ui/ArticleThumbnail";
 
 export const dynamic = "force-dynamic";
 
@@ -78,9 +79,8 @@ export default async function ArticlePage({ params }: Props) {
       </header>
 
       <div className="mt-5 overflow-hidden rounded-lg">
-        <img
+        <ArticleThumbnail
           src={article.imageUrl}
-          alt=""
           className="h-[240px] w-full object-cover sm:h-[280px]"
         />
       </div>

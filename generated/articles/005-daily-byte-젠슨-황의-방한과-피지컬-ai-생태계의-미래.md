@@ -17,7 +17,7 @@ categorySlug: tech
 writingStyle: 현장감 있는 해설 — 장 마감·뉴스 속보 직후의 분위기
 date: 2026.06.02
 readMinutes: 4
-imageUrl: 'https://images.unsplash.com/photo-1656428764153-6224cbaa1fe4?w=800&q=80'
+imageUrl: /api/media/images/19e84e32d4803380-t0.jpg
 marketInfo:
   kospi: '8,788.38'
   kosdaq: '1,050.03'

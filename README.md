@@ -117,6 +117,25 @@ Google Cloud **OAuth 클라이언트 JSON**을 프로젝트 루트에 `credentia
 | `CORS_ORIGIN` | `http://localhost:5173` | 프론트 origin (쉼표 구분) |
 | `GMAIL_QUERY` | (기본 검색어) | CLI/API 공통 |
 | `GMAIL_MAX_RESULTS` | `10` | 최대 건수 |
+| `UNSPLASH_ACCESS_KEY` | (없음) | Flux 미사용 시 Unsplash 검색 fallback |
+| `NVIDIA_API_KEY` | (없음) | **권장** — Flux.1-schnell로 글별 AI 썸네일 생성 ([build.nvidia.com](https://build.nvidia.com)) |
+
+### 썸네일 이미지
+
+**권장:** `NVIDIA_API_KEY`(nvapi-...)로 **Flux.1-schnell** 이미지 생성. 글마다 고유 썸네일이 `generated/images/`에 저장되고 `/api/media/images/`로 제공됩니다.
+
+```bash
+# .env
+NVIDIA_API_KEY=nvapi-...
+```
+
+기존 20편 썸네일을 Flux로 다시 만들기:
+
+```bash
+npm run fix:articles -- --generate-images
+```
+
+Unsplash는 `NVIDIA_API_KEY`가 없을 때만 사용됩니다 (`UNSPLASH_ACCESS_KEY`).
 
 ## 프론트엔드 (NewsBrief UI)
 

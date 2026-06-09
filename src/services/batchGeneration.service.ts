@@ -11,15 +11,7 @@ import {
   slugify,
   writeArticleMarkdown,
 } from "../utils/articleMarkdown.writer.js";
-
-const PLACEHOLDER_IMAGES = [
-  "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80",
-  "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80",
-  "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
-  "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80",
-  "https://images.unsplash.com/photo-1763788427834-95dec952e9cd?w=800&q=80",
-  "https://images.unsplash.com/photo-1656428764153-6224cbaa1fe4?w=800&q=80",
-];
+import { resolveArticleImageUrl } from "./articleImage.service.js";
 
 export type BatchGenerationOptions = {
   targetCount?: number;
@@ -135,6 +127,8 @@ export async function generateBatchArticles(
     return `${prefix}-${sourceTag}-${slugify(job.topic.title)}.md`;
   }
 
+  const usedImageUrls = new Set<string>();
+
   for (const job of jobs) {
     articleIndex += 1;
     const filename = jobFilename(job, articleIndex);
@@ -155,13 +149,21 @@ export async function generateBatchArticles(
       );
 
       const articleId = `${job.email.gmailMessageId}-t${job.topicIndex}`;
-      const generated = toGeneratedArticle(job.email, analysis);
+      const generated = toGeneratedArticle(job.email, analysis, { id: articleId });
+      const imageUrl = await resolveArticleImageUrl({
+        articleId,
+        title: generated.title,
+        description: generated.description,
+        categorySlug: generated.categorySlug,
+        imageSearchQuery: analysis.imageSearchQuery,
+        usedUrls: usedImageUrls,
+      });
       const article: GeneratedArticle = {
         ...generated,
         id: articleId,
         gmailMessageId: job.email.gmailMessageId,
-        imageUrl:
-          PLACEHOLDER_IMAGES[articleIndex % PLACEHOLDER_IMAGES.length],
+        imageUrl,
+        imageSearchQuery: analysis.imageSearchQuery,
       };
 
       writeArticleMarkdown(filePath, article, {

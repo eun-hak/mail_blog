@@ -1,6 +1,7 @@
 import { GEMINI_MODEL } from "../config/gemini.js";
 import type { GeneratedArticle } from "../types/article.types.js";
 import { assertAllowedSender, toGeneratedArticle } from "../utils/articleMapper.js";
+import { resolveArticleImageUrl } from "./articleImage.service.js";
 import { analyzeEmailToBlog } from "./gemini.service.js";
 import { syncEmailsFromGmail } from "./emailSync.service.js";
 
@@ -37,13 +38,27 @@ export async function generateArticlesFromGmail(
     };
   }
 
-  const analyses = await Promise.all(
-    emails.map(async (email) => {
-      assertAllowedSender(email);
-      const analysis = await analyzeEmailToBlog(email);
-      return toGeneratedArticle(email, analysis);
-    })
-  );
+  const usedImageUrls = new Set<string>();
+  const analyses: GeneratedArticle[] = [];
+
+  for (const email of emails) {
+    assertAllowedSender(email);
+    const analysis = await analyzeEmailToBlog(email);
+    const article = toGeneratedArticle(email, analysis);
+    const imageUrl = await resolveArticleImageUrl({
+      articleId: article.id,
+      title: article.title,
+      description: article.description,
+      categorySlug: article.categorySlug,
+      imageSearchQuery: analysis.imageSearchQuery,
+      usedUrls: usedImageUrls,
+    });
+    analyses.push({
+      ...article,
+      imageUrl,
+      imageSearchQuery: analysis.imageSearchQuery,
+    });
+  }
 
   return {
     articles: analyses,

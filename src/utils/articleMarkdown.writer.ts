@@ -64,6 +64,9 @@ export function writeArticleMarkdown(
     `date: "${article.date}"`,
     `readMinutes: ${article.readMinutes}`,
     `imageUrl: "${article.imageUrl}"`,
+    ...(article.imageSearchQuery
+      ? [`imageSearchQuery: "${escapeYaml(article.imageSearchQuery)}"`]
+      : []),
     "",
     "marketInfo:",
     `  kospi: ${mi.kospi ? `"${mi.kospi}"` : "null"}`,

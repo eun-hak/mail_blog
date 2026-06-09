@@ -146,7 +146,8 @@ ${lengthNote}
 - categorySlug: ai | tech | economy | policy | issue 중 하나.
 - highlights: 3~5개. 문장 형태·길이·말투를 서로 다르게.
 - marketInfo: 코스피·코스닥·원달러 숫자만. 없으면 null.
-- writingStyle: 위 '필수 스타일' 문구를 그대로 기입`;
+- writingStyle: 위 '필수 스타일' 문구를 그대로 기입
+- imageSearchQuery: 썸네일용 Unsplash 검색 키워드. **영어 2~4단어**. 글 주제의 핵심 사물·장면 (예: "nvidia ai chip", "korean stock market", "electric ferrari car"). 추상어·브랜드 슬로건보다 눈에 보이는 장면 위주.`;
 }
 
 async function generateBlogDraft(
@@ -222,6 +223,11 @@ const BLOG_SCHEMA = {
       },
       required: ["kospi", "kosdaq", "usdKrw"],
     },
+    imageSearchQuery: {
+      type: Type.STRING,
+      description:
+        "English 2-4 word Unsplash search query for article thumbnail",
+    },
   },
   required: [
     "title",
@@ -232,6 +238,7 @@ const BLOG_SCHEMA = {
     "body",
     "highlights",
     "marketInfo",
+    "imageSearchQuery",
   ],
 };
 

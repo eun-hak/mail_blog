@@ -3,6 +3,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import type { BlogCategorySlug, GeneratedArticle } from "../types/article.types.js";
 import { layoutArticleBody } from "./articleBody.formatter.js";
+import { pickArticleImage } from "./articleImages.js";
 
 type Frontmatter = {
   id?: string;
@@ -78,9 +79,7 @@ export function parseMarkdownArticleFile(filePath: string): GeneratedArticle {
     date: fm.date ?? "",
     relativeTime: formatRelativeTime(fm.date ?? ""),
     readMinutes: fm.readMinutes ?? 5,
-    imageUrl:
-      fm.imageUrl ??
-      "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80",
+    imageUrl: fm.imageUrl ?? pickArticleImage(id),
     text,
     marketInfo: {
       kospi: fm.marketInfo?.kospi ?? null,

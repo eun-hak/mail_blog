@@ -4,10 +4,12 @@ import { articlesRouter } from "./articles.routes.js";
 import { authRouter } from "./auth.routes.js";
 import { emailsRouter } from "./emails.routes.js";
 import { healthRouter } from "./health.routes.js";
+import { mediaRouter } from "./media.routes.js";
 
 export const apiRouter = Router();
 
 apiRouter.use(healthRouter);
+apiRouter.use(`${API_PREFIX}/media`, mediaRouter);
 apiRouter.use(`${API_PREFIX}/emails`, emailsRouter);
 apiRouter.use(`${API_PREFIX}/articles`, articlesRouter);
 apiRouter.use(`${API_PREFIX}/auth`, authRouter);
