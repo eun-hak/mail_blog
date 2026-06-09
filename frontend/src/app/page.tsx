@@ -7,6 +7,7 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { AdPlaceholder } from "@/components/ui/AdPlaceholder";
 import { NewsletterBox } from "@/components/ui/NewsletterBox";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { SITE_NAME } from "@/lib/constants";
 import type { Article } from "@/lib/types";
 
 export default async function HomePage() {
@@ -66,7 +67,7 @@ export default async function HomePage() {
         {uppityArticles.length > 0 && (
           <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
             <div className="space-y-4">
-              <CategorySectionLabel label="UPPITY · 경제" />
+              <CategorySectionLabel label={`${SITE_NAME} · 경제`} />
               <FeaturedNewsCard article={uppityArticles[0]} />
             </div>
             <div className="grid gap-4">
@@ -79,7 +80,7 @@ export default async function HomePage() {
         {dailyArticles.length > 0 && (
           <div className="grid gap-6 md:grid-cols-3">
             <div className="md:col-span-3">
-              <CategorySectionLabel label="DAILY_BYTE · 테크" />
+              <CategorySectionLabel label={`${SITE_NAME} · 테크`} />
             </div>
             {dailyArticles.slice(0, 3).map((a) => (
               <NewsCard key={a.id} article={a} />

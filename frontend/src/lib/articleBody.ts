@@ -79,21 +79,46 @@ function repairSplitAiPcHeading(text: string): string {
 }
 
 function repairBrokenHeadings(text: string): string {
-  return text.replace(
-    /(### [^\n]+)\n\n([^\n#.\n]{2,20})\n\n/g,
-    (_, heading, fragment) => {
-      if (/[?!.:]$/.test(String(heading).trim())) {
-        return `${heading}\n\n${fragment}\n\n`;
+  let result = text.trim();
+  let changed = true;
+
+  while (changed) {
+    changed = false;
+    result = result.replace(
+      /(### [^\n]+)\n\n([^\n#]+)\n\n/g,
+      (match, heading, fragment) => {
+        if (!looksLikeHeadingContinuation(String(heading), String(fragment))) {
+          return match;
+        }
+        changed = true;
+        return `${heading} ${String(fragment).trim()}\n\n`;
       }
-      if (String(fragment).includes(" ") && String(fragment).length > 10) {
-        return `${heading}\n\n${fragment}\n\n`;
-      }
-      if (String(heading).trim().length + String(fragment).length > 52) {
-        return `${heading}\n\n${fragment}\n\n`;
-      }
-      return `${heading} ${fragment}\n\n`;
-    }
-  );
+    );
+  }
+
+  return result;
+}
+
+function looksLikeHeadingContinuation(heading: string, fragment: string): boolean {
+  const h = heading.replace(/^###\s+/, "").trim();
+  const f = fragment.trim();
+  if (!f || f.startsWith("###")) return false;
+  if (f.length > 40) return false;
+  if (/[?!…]$/.test(h) && h.length <= 48) return false;
+  if (/(?:인가|일까|할까)$/.test(h)) return false;
+  const headingCutMid =
+    /[,·]$/.test(h) ||
+    (/(?:은|는|을|를|와|과|에|의|로)$/u.test(h) && !/(?:인가|일까|할까)$/.test(h));
+  if (BODY_START.test(` ${f}`) && !headingCutMid) return false;
+  if (/^(최근|이번|한편|그러나|하지만|특히|다만|오늘|정부|시장|미국|한국|트럼프|네이버|대통령|이스라엘)/.test(f) && f.length > 12) {
+    return false;
+  }
+  if (/[,·]$/.test(h) || /(?:은|는)$/u.test(h)) {
+    return f.length <= 35;
+  }
+  if (f.length <= 16 && /(?:인가|일까|할까|인가\?|일까\?)$/.test(f)) return true;
+  if (!/[.!?…]$/.test(h) && h.length >= 10 && f.length <= 22) return true;
+  return false;
 }
 
 function formatArticleBody(text: string): string {
@@ -204,20 +229,34 @@ function layoutArticleBody(text: string): string {
 }
 
 export function parseArticleBlocks(text: string): ArticleBlock[] {
+  const parts = text.split(/\n\n+/).map((p) => p.trim()).filter(Boolean);
   const blocks: ArticleBlock[] = [];
 
-  for (const part of text.split(/\n\n+/)) {
-    const trimmed = part.trim();
+  for (let i = 0; i < parts.length; i++) {
+    const trimmed = parts[i];
     if (!trimmed) continue;
 
     if (trimmed.startsWith("### ")) {
-      const { title, body } = splitInlineHeading(trimmed.slice(4).trim());
-      if (title) blocks.push({ type: "subtitle", content: title });
-      if (body) {
-        for (const para of wrapParagraphs(body)) {
+      let title = trimmed.slice(4).trim();
+      const { title: inlineTitle, body: inlineBody } = splitInlineHeading(title);
+      title = inlineTitle;
+      if (inlineBody) {
+        blocks.push({ type: "subtitle", content: title });
+        for (const para of wrapParagraphs(inlineBody)) {
           blocks.push({ type: "paragraph", content: para });
         }
+        continue;
       }
+
+      while (i + 1 < parts.length) {
+        const next = parts[i + 1];
+        if (next.startsWith("### ")) break;
+        if (!looksLikeHeadingContinuation(`### ${title}`, next)) break;
+        title = `${title} ${next}`.trim();
+        i += 1;
+      }
+
+      blocks.push({ type: "subtitle", content: title });
       continue;
     }
 

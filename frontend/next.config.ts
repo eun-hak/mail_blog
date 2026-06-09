@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const apiUrl = process.env.API_URL ?? "http://localhost:3001";
+const apiUrl = process.env.API_URL ?? "http://localhost:3002";
 
 const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(__dirname),

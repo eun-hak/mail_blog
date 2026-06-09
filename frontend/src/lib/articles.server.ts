@@ -1,14 +1,18 @@
 import { USE_MOCK_DATA } from "./config";
+import { formatArticleByline } from "./constants";
 import { fetchMockArticles } from "./mock";
 import type { ApiResponse, Article } from "./types";
 
 function apiBase(): string {
-  return process.env.API_URL ?? "http://localhost:3001";
+  return process.env.API_URL ?? "http://localhost:3002";
 }
 
 export async function getArticles(): Promise<Article[]> {
   if (USE_MOCK_DATA) {
-    return fetchMockArticles(30);
+    return fetchMockArticles(30).map((article) => ({
+      ...article,
+      author: formatArticleByline(article.author),
+    }));
   }
 
   const res = await fetch(`${apiBase()}/api/articles/example`, {
@@ -24,5 +28,8 @@ export async function getArticles(): Promise<Article[]> {
     throw new Error("API 응답 오류");
   }
 
-  return json.data;
+  return json.data.map((article) => ({
+    ...article,
+    author: formatArticleByline(article.author),
+  }));
 }

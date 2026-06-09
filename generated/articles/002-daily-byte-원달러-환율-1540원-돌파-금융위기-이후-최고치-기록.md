@@ -15,7 +15,7 @@ categorySlug: economy
 writingStyle: 이슈 뒤 숨은 구조를 파헤치는 분석 — 정책·시장 연결고리
 date: 2026.06.05
 readMinutes: 4
-imageUrl: /api/media/images/19e9456ffa907c2c-t0.jpg
+imageUrl: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?v=1780973006465'
 marketInfo:
   kospi: '2,480.20'
   kosdaq: '710.50'

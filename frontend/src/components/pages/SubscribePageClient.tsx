@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { SITE_NAME } from "@/lib/constants";
 import { Mail, CheckCircle2 } from "lucide-react";
 
 export function SubscribePageClient() {
@@ -13,7 +14,7 @@ export function SubscribePageClient() {
         뉴스레터 구독
       </h1>
       <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-ink-secondary">
-        UPPITY · DAILY_BYTE 핵심 뉴스를 이메일로 받아보세요. 매일 아침 3분
+        {SITE_NAME} 핵심 뉴스를 이메일로 받아보세요. 매일 아침 3분
         요약으로 시작하세요.
       </p>
 

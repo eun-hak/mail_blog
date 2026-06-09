@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Newsreader } from "next/font/google";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { SITE_NAME } from "@/lib/constants";
 import "./globals.css";
 
 const inter = Inter({
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
     default: "NewsBrief",
     template: "%s | NewsBrief",
   },
-  description: "UPPITY · DAILY_BYTE 기반 경제·테크 블로그",
+  description: `${SITE_NAME} — 경제·테크 블로그`,
 };
 
 export default function RootLayout({

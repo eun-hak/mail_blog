@@ -9,8 +9,8 @@ import {
 import type { GeminiBlogAnalysis } from "../types/article.types.js";
 import type { ParsedEmail } from "../types/email.types.js";
 import type { ExtractedTopic } from "../types/topic.types.js";
-import { layoutArticleBody } from "../utils/articleBody.formatter.js";
 import { geminiThrottle, withGeminiRetry } from "../utils/geminiRetry.js";
+import { extractSectionTitles } from "../utils/articleBody.formatter.js";
 
 export class GeminiServiceError extends Error {
   constructor(
@@ -88,6 +88,7 @@ function buildPrompt(
 - 주제: ${options.topic.title}
 - 관점: ${options.topic.angle}
 - 다른 섹션은 최소한만 언급하고, 위 주제 하나에 집중하세요.
+- 본문 ### 소제목 3~6개는 **위 주제·관점**을 논리적으로 나눈 단계여야 합니다. 주제와 무관한 일반 라벨·뻔한 템플릿 금지.
 `
     : "";
 
@@ -123,12 +124,14 @@ ${lengthNote}
 - 반말, 해요체 혼용, 뉴스 속보체(~했다, ~이다) 금지.
 - 독자에게 말 걸 때도 "여러분", "~하시는 분" 등 존중하는 표현을 사용합니다.
 
-### 4. 본문 소제목 (흐름에 맞게)
-- body 안에 **3~5개의 소제목**을 넣습니다. 형식은 반드시 \`### 소제목\\n\\n본문...\` (소제목 뒤 빈 줄 필수, 본문과 같은 줄에 쓰지 마세요)
-- 소제목은 **그 순간 전개되는 논지를 요약**해야 합니다. 예: "배경", "전망", "핵심 요약" 같은 템플릿 라벨 금지.
+### 4. 본문 소제목 (주제에 맞게 3~6개)
+- body 안에 **주제 전개에 맞는 ### 소제목을 반드시 3~6개** 넣습니다. 2개 이하·7개 이상이면 실패입니다.
+- 형식은 반드시 \`### 소제목\\n\\n본문...\` (소제목 뒤 빈 줄 필수, 본문과 같은 줄에 쓰지 마세요)
+- **소제목은 반드시 한 줄**에 작성하세요. 줄바꿈으로 소제목을 나누지 마세요.
+- 소제목은 **그 순간 전개되는 논지·장면·질문**을 요약해야 합니다. "배경", "전망", "핵심 요약", "시사점", "마무리" 같은 템플릿 라벨 금지.
 - \`**굵게**\`, HTML 태그, 밑줄 등 추가 마크업 금지. 소제목은 \`###\`만 사용합니다.
-- 글마다 소제목 문구·개수·위치를 다르게. 소제목 없이 이어지는 구간도 1~2문단 허용.
-- 소제목 아래 문단은 2~4개, 소제목마다 분량과 톤이 달라도 됩니다.
+- 글마다 소제목 문구·개수(3~6)·순서를 다르게. 주제가 복잡하면 5~6개, 단순하면 3~4개.
+- 도입부는 소제목 없이 1문단 허용. 그 외 본문은 소제목 아래 2~4문단으로 전개합니다.
 
 ### 5. 어투·구조 (템플릿 금지)
 - 위에 지정된 **필수 스타일**만 사용. 다른 글과 같은 도입·마무리 패턴을 쓰지 마세요.
@@ -147,7 +150,20 @@ ${lengthNote}
 - highlights: 3~5개. 문장 형태·길이·말투를 서로 다르게.
 - marketInfo: 코스피·코스닥·원달러 숫자만. 없으면 null.
 - writingStyle: 위 '필수 스타일' 문구를 그대로 기입
-- imageSearchQuery: 썸네일용 Unsplash 검색 키워드. **영어 2~4단어**. 글 주제의 핵심 사물·장면 (예: "nvidia ai chip", "korean stock market", "electric ferrari car"). 추상어·브랜드 슬로건보다 눈에 보이는 장면 위주.`;
+- imageSearchQuery: Flux/Unsplash 썸네일용 **영어 장면 묘사 3~6단어**. 눈에 보이는 사물·장소·조명만 (예: "semiconductor wafer blue light", "gold coins desk macro", "electric car studio").
+  금지: 추상 개념(trust, crisis), text/logo/sign/screen/UI/chart/newspaper/headline/face close-up. 한글·숫자·브랜드 슬로건 넣지 마세요.`;
+}
+
+function countSubheadings(body: string): number {
+  return extractSectionTitles(body).length;
+}
+
+function buildSubheadingRetryNote(count: number, assignedStyle: string): string {
+  return `
+## ⚠️ 소제목 보정 (필수)
+이전 body의 ### 소제목은 ${count}개입니다. **주제에 맞는 소제목을 3~6개** 넣어 다시 작성하세요.
+- "배경", "전망", "시사점", "마무리" 같은 템플릿 라벨 금지
+- 필수 스타일(${assignedStyle}) 유지`;
 }
 
 async function generateBlogDraft(
@@ -168,7 +184,7 @@ async function generateBlogDraft(
         systemInstruction: `당신은 독립 경제·테크 블로그의 칼럼니스트입니다.
 뉴스레터는 소재일 뿐이며, 글의 문체·구조·도입·마무리는 매번 새롭게 만듭니다.
 사실 관계는 지키되, 뉴스 요약문이 아닌 독자가 끝까지 읽고 싶은 오리지널 칼럼을 씁니다.
-본문은 존댓말(합니다체)로 작성하고, 흐름에 맞는 ### 소제목으로 단락을 나눕니다.
+본문은 존댓말(합니다체)로 작성하고, 주제 전개에 맞는 ### 소제목 3~6개로 단락을 나눕니다.
 본문 body는 공백 제외 최소 ${BLOG_BODY_MIN_CHARS}자, 최대 ${BLOG_BODY_MAX_CHARS}자입니다. 이보다 짧으면 안 됩니다.`,
       responseMimeType: "application/json",
       responseJsonSchema: BLOG_SCHEMA,
@@ -209,7 +225,11 @@ const BLOG_SCHEMA = {
       type: Type.STRING,
       description: "이 글에 적용한 서술 스타일 한 줄 설명",
     },
-    body: { type: Type.STRING },
+    body: {
+      type: Type.STRING,
+      description:
+        "본문. 주제에 맞는 ### 소제목 3~6개. 각 소제목 뒤 빈 줄 후 2~4문단.",
+    },
     highlights: {
       type: Type.ARRAY,
       items: { type: Type.STRING },
@@ -281,7 +301,7 @@ async function generateBlogFromEmail(
       const lengthNote = `
 ## ⚠️ 분량 보정 (필수) — 재시도 ${attempt + 2}회차
 이전 body는 공백 제외 ${charCount}자입니다. **최소 ${BLOG_BODY_MIN_CHARS}자, 권장 2400자 전후**로 다시 작성하세요.
-- 필수 스타일(${options.assignedStyle}) 유지.`;
+- ### 소제목 3~6개 유지. 필수 스타일(${options.assignedStyle}) 유지.`;
       draft = await generateBlogDraft(
         ai,
         email,
@@ -293,9 +313,25 @@ async function generateBlogFromEmail(
       charCount = countBodyChars(draft.body);
     }
 
+    for (
+      let attempt = 0;
+      attempt < 2 &&
+      (countSubheadings(draft.body) < 3 || countSubheadings(draft.body) > 6);
+      attempt++
+    ) {
+      draft = await generateBlogDraft(
+        ai,
+        email,
+        body,
+        options.assignedStyle,
+        buildSubheadingRetryNote(countSubheadings(draft.body), options.assignedStyle),
+        options.topic
+      );
+    }
+
     return {
       ...draft,
-      body: layoutArticleBody(draft.body),
+      body: draft.body,
     };
   } catch (error) {
     if (error instanceof GeminiServiceError) throw error;

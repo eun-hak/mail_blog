@@ -15,7 +15,7 @@ categorySlug: economy
 writingStyle: 독자에게 말 거는 대화체 — 포트폴리오와 일상에서의 체감
 date: 2026.06.01
 readMinutes: 4
-imageUrl: /api/media/images/19e7fd0c671b01a1-t0.jpg
+imageUrl: 'https://images.unsplash.com/photo-1651341050677-24dba59ce0fd?v=1780973006472'
 marketInfo:
   kospi: '8,476.15'
   kosdaq: '1,074.80'

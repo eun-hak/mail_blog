@@ -46,8 +46,10 @@ function splitMergedHeadingTail(title: string): { title: string; bodyLead: strin
   return { title, bodyLead: "" };
 }
 
-/** 본문 첫 줄에 소제목이 붙어 있는 경우 ### 로 승격 */
+/** 본문 첫 줄에 소제목이 붙어 있는 경우 ### 로 승격 (LLM 초안 전용) */
 function promoteParagraphLeadHeading(text: string): string {
+  if (/^### /m.test(text)) return text;
+
   const blocks = text.split(/\n\n+/);
   const out: string[] = [];
 
@@ -87,23 +89,84 @@ function repairSplitAiPcHeading(text: string): string {
   );
 }
 
-/** 잘못 분리된 소제목 줄(### 아래 짧은 한 줄) 복구 — 본문 조각과 합치지 않도록 보수적으로 */
+/** 소제목 다음 줄이 본문이 아니라 제목 이어쓰기인지 판별 */
+export function looksLikeHeadingContinuation(
+  heading: string,
+  fragment: string
+): boolean {
+  const h = heading.replace(/^###\s+/, "").trim();
+  const f = fragment.trim();
+  if (!f || f.startsWith("###")) return false;
+  if (f.length > 40) return false;
+
+  // 이미 완결된 질문형 소제목
+  if (/[?!…]$/.test(h) && h.length <= 48) return false;
+  if (/(?:인가|일까|할까)$/.test(h)) return false;
+
+  // 본문 시작 패턴 (단, 앞 줄이 조사/쉼표로 끊긴 소제목이면 이어쓰기로 처리)
+  const headingCutMid =
+    /[,·]$/.test(h) ||
+    (/(?:은|는|을|를|와|과|에|의|로)$/u.test(h) && !/(?:인가|일까|할까)$/.test(h));
+  if (BODY_START.test(` ${f}`) && !headingCutMid) return false;
+  if (/^(최근|이번|한편|그러나|하지만|특히|다만|오늘|정부|시장|미국|한국|트럼프|네이버|대통령|이스라엘)/.test(f) && f.length > 12) {
+    return false;
+  }
+
+  // "…성적표는" + "결국 민생…"처럼 조사/쉼표 뒤 이어짐
+  if (/[,·]$/.test(h) || /(?:은|는)$/u.test(h)) {
+    return f.length <= 35;
+  }
+
+  // "…주거" + "사다리인가"처럼 짧은 꼬리
+  if (f.length <= 16 && /(?:인가|일까|할까|인가\?|일까\?)$/.test(f)) return true;
+
+  // 문장 부호 없이 끊긴 긴 소제목 + 짧은 다음 줄
+  if (!/[.!?…]$/.test(h) && h.length >= 10 && f.length <= 22) return true;
+
+  return false;
+}
+
+/** 잘못 분리된 소제목 줄(### 아래 짧은 한 줄) 복구 */
 function repairBrokenHeadings(text: string): string {
-  return text.replace(
-    /(### [^\n]+)\n\n([^\n#.\n]{2,20})\n\n/g,
-    (_, heading, fragment) => {
-      if (/[?!.:]$/.test(String(heading).trim())) {
-        return `${heading}\n\n${fragment}\n\n`;
+  let result = text.trim();
+  let changed = true;
+
+  while (changed) {
+    changed = false;
+    result = result.replace(
+      /(### [^\n]+)\n\n([^\n#]+)\n\n/g,
+      (match, heading, fragment) => {
+        if (!looksLikeHeadingContinuation(String(heading), String(fragment))) {
+          return match;
+        }
+        changed = true;
+        return `${heading} ${String(fragment).trim()}\n\n`;
       }
-      if (String(fragment).includes(" ") && String(fragment).length > 10) {
-        return `${heading}\n\n${fragment}\n\n`;
-      }
-      if (String(heading).trim().length + String(fragment).length > 52) {
-        return `${heading}\n\n${fragment}\n\n`;
-      }
-      return `${heading} ${fragment}\n\n`;
-    }
-  );
+    );
+  }
+
+  return result;
+}
+
+/** 같은 줄에 붙은 본문만 분리 (BODY_START 분리는 저장 md에서 소제목을 깨뜨림) */
+function splitSameLineHeadingBody(line: string): { title: string; body: string } {
+  const newlineIdx = line.indexOf("\n");
+  if (newlineIdx !== -1) {
+    return {
+      title: line.slice(0, newlineIdx).trim(),
+      body: line.slice(newlineIdx + 1).trim(),
+    };
+  }
+
+  const qIdx = line.indexOf("? ");
+  if (qIdx >= 8 && qIdx <= 72) {
+    return {
+      title: line.slice(0, qIdx + 1).trim(),
+      body: line.slice(qIdx + 2).trim(),
+    };
+  }
+
+  return { title: line.trim(), body: "" };
 }
 
 /** ### 소제목 앞뒤 줄바꿈 정규화 + 제목/본문 분리 */
@@ -114,17 +177,19 @@ export function formatArticleBody(text: string): string {
   );
 
   formatted = formatted.replace(/###\s+([^\n]+)/g, (_match, line: string) => {
-    let { title, body } = splitInlineHeading(line);
+    let { title, body } = splitSameLineHeadingBody(line);
     if (!body) {
       const split = splitMergedHeadingTail(title);
       title = split.title;
-    if (split.bodyLead) {
-      body = body ? `${split.bodyLead} ${body}` : split.bodyLead;
-    }
+      if (split.bodyLead) {
+        body = body ? `${split.bodyLead} ${body}` : split.bodyLead;
+      }
     }
     if (!body) return `### ${title}`;
     return `### ${title}\n\n${body}`;
   });
+
+  formatted = repairBrokenHeadings(formatted);
 
   return formatted.replace(/\n{3,}/g, "\n\n").trim();
 }
@@ -193,12 +258,22 @@ function unwrapForRelayout(text: string): string {
 }
 
 /** 소제목 정리 + 문단 나누기 (md 저장·API용) */
-export function layoutArticleBody(text: string): string {
-  const formatted = formatArticleBody(
-    promoteParagraphLeadHeading(
-      repairSplitAiPcHeading(unwrapForRelayout(text))
-    )
-  );
+export type LayoutArticleBodyOptions = {
+  /** LLM 초안 최초 저장 시 true. 저장된 md 재처리 시 false(unwrap·승격 금지) */
+  relayout?: boolean;
+};
+
+export function layoutArticleBody(
+  text: string,
+  options: LayoutArticleBodyOptions = {}
+): string {
+  const relayout = options.relayout ?? false;
+  const prepped = relayout
+    ? promoteParagraphLeadHeading(
+        repairSplitAiPcHeading(unwrapForRelayout(text))
+      )
+    : repairSplitAiPcHeading(text.trim());
+  const formatted = formatArticleBody(prepped);
   const blocks = formatted.split(/\n\n+/);
   const out: string[] = [];
 

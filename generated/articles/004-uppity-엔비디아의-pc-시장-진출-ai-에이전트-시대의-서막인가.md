@@ -17,7 +17,7 @@ categorySlug: tech
 writingStyle: 담담한 관찰자 시점 — 시장 소음 속에서 구조와 패턴을 읽는 해설
 date: 2026.06.04
 readMinutes: 4
-imageUrl: /api/media/images/19e8f273f1b13541-t0.jpg
+imageUrl: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?v=1780973006468'
 marketInfo:
   kospi: '8801.49'
   kosdaq: '1026.03'

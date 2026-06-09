@@ -9,6 +9,7 @@ import { ShareButtons } from "@/components/ui/ShareButtons";
 import { NewsCard } from "@/components/ui/NewsCard";
 import { ArticleBody } from "@/components/ui/ArticleBody";
 import { ArticleThumbnail } from "@/components/ui/ArticleThumbnail";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 export const dynamic = "force-dynamic";
 
@@ -38,7 +39,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ArticlePage({ params }: Props) {
   const { id } = await params;
-  const articles = await getArticles();
+
+  let articles;
+  try {
+    articles = await getArticles();
+  } catch {
+    return (
+      <EmptyState
+        title="글을 불러오지 못했습니다"
+        description="백엔드 API(localhost:3002)가 실행 중인지 확인한 뒤 새로고침해 주세요."
+      />
+    );
+  }
+
   const article = getArticleById(articles, id);
 
   if (!article) {

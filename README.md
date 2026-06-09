@@ -129,10 +129,26 @@ Google Cloud **OAuth 클라이언트 JSON**을 프로젝트 루트에 `credentia
 NVIDIA_API_KEY=nvapi-...
 ```
 
-기존 20편 썸네일을 Flux로 다시 만들기:
+기존 20편 썸네일을 Flux로 다시 만들기 (**본문·핵심 요약은 수정하지 않음**):
 
 ```bash
 npm run fix:articles -- --generate-images
+```
+
+불량(너무 작거나 깨진) Flux JPEG만 자동 재생성:
+
+```bash
+npm run fix:articles
+```
+
+`npm run fix:articles`는 404 URL·20KB 미만 JPEG 등 불량 이미지를 감지해 Flux로 다시 만듭니다.
+
+**이미지 품질 팁:** Flux.1-schnell은 빠르지만 가끔 글자·UI가 섞입니다. 프롬프트는 영어 장면 묘사만 사용하고, `imageSearchQuery`에 text/logo/screen 같은 단어를 넣지 않도록 Gemini에 지시합니다. 3회 재시도 후에도 실패하면 Unsplash → 검증된 풀로 fallback합니다.
+
+마크업(본문·핵심 요약)을 의도적으로 다시 정리할 때만:
+
+```bash
+npm run fix:articles -- --fix-markup
 ```
 
 Unsplash는 `NVIDIA_API_KEY`가 없을 때만 사용됩니다 (`UNSPLASH_ACCESS_KEY`).

@@ -28,7 +28,10 @@ if [[ ! -d frontend/node_modules ]]; then
   npm install --prefix frontend
 fi
 
-echo "백엔드 API 시작 → http://localhost:3001"
+PORT="${PORT:-3002}"
+export PORT
+
+echo "백엔드 API 시작 → http://localhost:${PORT}"
 npm run dev &
 BACK_PID=$!
 
@@ -37,7 +40,7 @@ npm run dev --prefix frontend &
 FRONT_PID=$!
 
 echo ""
-echo "  백엔드:  http://localhost:3001"
+echo "  백엔드:  http://localhost:${PORT}"
 echo "  프론트:  http://localhost:5173"
 echo ""
 echo "Ctrl+C 로 모두 종료합니다."

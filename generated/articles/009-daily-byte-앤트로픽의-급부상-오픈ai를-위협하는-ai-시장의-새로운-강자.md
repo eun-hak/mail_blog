@@ -17,7 +17,7 @@ categorySlug: ai
 writingStyle: 현장감 있는 해설 — 장 마감·뉴스 속보 직후의 분위기
 date: 2026.06.01
 readMinutes: 4
-imageUrl: /api/media/images/19e7fc4aae020b39-t1.jpg
+imageUrl: 'https://images.unsplash.com/photo-1674027444485-cec3da58eef4?v=1780973006473'
 marketInfo:
   kospi: '2,750'
   kosdaq: '850'

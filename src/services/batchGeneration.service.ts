@@ -18,6 +18,8 @@ export type BatchGenerationOptions = {
   emailLimit?: number;
   outputDir?: string;
   newerThanDays?: number;
+  /** Gmail 검색 쿼리 (지정 시 newerThanDays 대신 사용) */
+  query?: string;
   /** true면 generated/pending-jobs.json 에서 이어서 생성 */
   resume?: boolean;
 };
@@ -57,6 +59,28 @@ export function getGeneratedArticlesDir(): string {
   return path.join(process.cwd(), "generated", "articles");
 }
 
+function getNextArticleIndex(outputDir: string): number {
+  if (!fs.existsSync(outputDir)) return 0;
+  const nums = fs
+    .readdirSync(outputDir)
+    .filter((f) => /^\d{3}-/.test(f))
+    .map((f) => parseInt(f.slice(0, 3), 10))
+    .filter((n) => Number.isFinite(n));
+  return nums.length > 0 ? Math.max(...nums) : 0;
+}
+
+function loadExistingArticleIds(outputDir: string): Set<string> {
+  const ids = new Set<string>();
+  if (!fs.existsSync(outputDir)) return ids;
+  for (const file of fs.readdirSync(outputDir)) {
+    if (!file.endsWith(".md")) continue;
+    const raw = fs.readFileSync(path.join(outputDir, file), "utf-8");
+    const match = raw.match(/^id: "?([^"\n]+)"?/m);
+    if (match) ids.add(match[1].trim());
+  }
+  return ids;
+}
+
 export async function generateBatchArticles(
   options: BatchGenerationOptions = {}
 ): Promise<BatchGenerationResult> {
@@ -79,7 +103,8 @@ export async function generateBatchArticles(
     emailsFetched = saved.emailsFetched;
     console.log(`  이어하기: 저장된 주제 ${allJobs.length}개 로드\n`);
   } else {
-    const query = buildNewsletterSearchQuery(newerThanDays);
+    const query =
+      options.query ?? buildNewsletterSearchQuery(newerThanDays);
     const { emails } = await syncEmailsFromGmail({
       q: query,
       maxResults: emailLimit,
@@ -117,7 +142,8 @@ export async function generateBatchArticles(
 
   fs.mkdirSync(outputDir, { recursive: true });
   const files: string[] = [];
-  let articleIndex = 0;
+  let articleIndex = getNextArticleIndex(outputDir);
+  const existingIds = loadExistingArticleIds(outputDir);
 
   function jobFilename(job: TopicArticleJob, order: number): string {
     const sourceTag = job.email.from?.toUpperCase().includes("DAILY_BYTE")
@@ -130,6 +156,12 @@ export async function generateBatchArticles(
   const usedImageUrls = new Set<string>();
 
   for (const job of jobs) {
+    const articleId = `${job.email.gmailMessageId}-t${job.topicIndex}`;
+    if (existingIds.has(articleId)) {
+      console.log(`[skip] 이미 존재: ${articleId} (${job.topic.title})`);
+      continue;
+    }
+
     articleIndex += 1;
     const filename = jobFilename(job, articleIndex);
     const filePath = path.join(outputDir, filename);
@@ -148,7 +180,6 @@ export async function generateBatchArticles(
         articleIndex
       );
 
-      const articleId = `${job.email.gmailMessageId}-t${job.topicIndex}`;
       const generated = toGeneratedArticle(job.email, analysis, { id: articleId });
       const imageUrl = await resolveArticleImageUrl({
         articleId,
@@ -171,6 +202,7 @@ export async function generateBatchArticles(
         topic: job.topic,
       });
       files.push(filePath);
+      existingIds.add(articleId);
       console.log(`  ✓ 저장: ${filename}`);
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);

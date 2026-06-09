@@ -1,5 +1,16 @@
 import type { CategorySlug } from "./types";
 
+/** 사이트·도메인 표시명 (헤더·글 byline 등) */
+export const SITE_NAME = "NewsBrief";
+
+const LEGACY_SOURCE_NAMES = new Set(["UPPITY", "DAILY_BYTE"]);
+
+/** 뉴스레터 발신명(UPPITY/DAILY_BYTE) → 사이트명으로 표시 */
+export function formatArticleByline(name: string): string {
+  if (LEGACY_SOURCE_NAMES.has(name.toUpperCase())) return SITE_NAME;
+  return name;
+}
+
 export const CATEGORIES: {
   slug: CategorySlug;
   label: string;

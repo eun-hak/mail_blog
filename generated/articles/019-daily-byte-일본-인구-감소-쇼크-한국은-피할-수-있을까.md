@@ -17,7 +17,7 @@ categorySlug: economy
 writingStyle: 담담한 관찰자 시점 — 숫자 뒤의 의미를 차분히 짚기
 date: 2026.06.02
 readMinutes: 4
-imageUrl: /api/media/images/19e84e32d4803380-t1.jpg
+imageUrl: 'https://images.unsplash.com/photo-1691643158804-d3f02eb456a3?v=1780973006479'
 marketInfo:
   kospi: '8788.38'
   kosdaq: '1050.03'

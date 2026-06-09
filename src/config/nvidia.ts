@@ -9,3 +9,5 @@ export const NVIDIA_FLUX_ENDPOINT =
 export const FLUX_IMAGE_WIDTH = 1344;
 export const FLUX_IMAGE_HEIGHT = 768;
 export const FLUX_STEPS = 4;
+/** 품질 검증 실패 시 최대 재시도 횟수 */
+export const FLUX_MAX_ATTEMPTS = Number(process.env.FLUX_MAX_ATTEMPTS ?? 3);

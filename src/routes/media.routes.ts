@@ -7,7 +7,8 @@ export const mediaRouter = Router();
 mediaRouter.use(
   "/images",
   express.static(getGeneratedImagesDir(), {
-    maxAge: "7d",
+    maxAge: process.env.NODE_ENV === "production" ? "7d" : 0,
     fallthrough: false,
+    etag: true,
   })
 );

@@ -22,6 +22,8 @@ export type ResolveArticleImageParams = {
   imageSearchQuery?: string;
   usedUrls?: Set<string>;
   forceGenerate?: boolean;
+  /** Unsplash 전용 갱신 등 Flux를 건너뛸 때 */
+  skipFlux?: boolean;
 };
 
 function buildFallbackQuery(
@@ -62,7 +64,7 @@ async function pickVerifiedFallback(
 export async function resolveArticleImageUrl(
   params: ResolveArticleImageParams
 ): Promise<string> {
-  if (NVIDIA_FLUX_ENABLED) {
+  if (NVIDIA_FLUX_ENABLED && !params.skipFlux) {
     const generated = await generateFluxArticleImage({
       articleId: params.articleId,
       title: params.title,
@@ -75,6 +77,9 @@ export async function resolveArticleImageUrl(
       params.usedUrls?.add(generated);
       return generated;
     }
+    console.warn(
+      `  ⚠ Flux 생성·검증 실패 → fallback (${params.articleId})`
+    );
   }
 
   if (UNSPLASH_ENABLED) {

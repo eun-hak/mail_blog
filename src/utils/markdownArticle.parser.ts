@@ -2,7 +2,6 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import type { BlogCategorySlug, GeneratedArticle } from "../types/article.types.js";
-import { layoutArticleBody } from "./articleBody.formatter.js";
 import { pickArticleImage } from "./articleImages.js";
 
 type Frontmatter = {
@@ -35,7 +34,7 @@ function parseHighlights(content: string): string[] {
 
 function parseBody(content: string): string {
   const section = content.match(/## 본문\s*\n+([\s\S]*)$/);
-  return section ? layoutArticleBody(section[1]) : "";
+  return section ? section[1].trim() : "";
 }
 
 function formatRelativeTime(dateStr: string): string {
@@ -114,4 +113,26 @@ export function listExampleMarkdownFiles(): string[] {
   const generated = listMarkdownInDir(getGeneratedArticlesDir());
   if (generated.length > 0) return generated;
   return listMarkdownInDir(getExampleArticlesDir());
+}
+
+function parseArticleDateMs(dateStr: string): number {
+  const parts = dateStr.split(".");
+  if (parts.length !== 3) return 0;
+  const t = new Date(
+    Number(parts[0]),
+    Number(parts[1]) - 1,
+    Number(parts[2])
+  ).getTime();
+  return Number.isNaN(t) ? 0 : t;
+}
+
+/** 날짜(내림차순) → analyzedAt 순 */
+export function sortArticlesByRecency(
+  articles: GeneratedArticle[]
+): GeneratedArticle[] {
+  return [...articles].sort((a, b) => {
+    const byDate = parseArticleDateMs(b.date) - parseArticleDateMs(a.date);
+    if (byDate !== 0) return byDate;
+    return b.analyzedAt.localeCompare(a.analyzedAt);
+  });
 }

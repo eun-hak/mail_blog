@@ -15,7 +15,7 @@ categorySlug: tech
 writingStyle: 이슈 뒤 숨은 구조를 파헤치는 분석 — 겉 뉴스 너머의 메커니즘
 date: 2026.06.02
 readMinutes: 4
-imageUrl: /api/media/images/19e84d898f0e15e0-t0.jpg
+imageUrl: 'https://images.unsplash.com/photo-1697577418970-95d99b5a55cf?v=1780973006470'
 marketInfo:
   kospi: '8,788.38'
   kosdaq: '1,050.03'

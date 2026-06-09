@@ -15,14 +15,14 @@ categorySlug: tech
 writingStyle: 이슈 뒤 숨은 구조를 파헤치는 분석 — 겉 뉴스 너머의 메커니즘
 date: 2026.06.05
 readMinutes: 4
-imageUrl: /api/media/images/19e9471ca67344c0-t1.jpg
+imageUrl: 'https://images.unsplash.com/photo-1562408590-e32931084e23?v=1780973006476'
 marketInfo:
   kospi: '8,639.41'
   kosdaq: '1,049.73'
   usdKrw: '1,529.70'
 model: gemini-3.1-flash-lite
 analyzedAt: '2026-06-05T07:19:13.361Z'
-bodyChars: 1786
+bodyChars: 1784
 status: draft
 ---
 > 엔비디아의 차세대 가속기와 AI PC의 확산이 메모리 반도체 시장의 지형도를 어떻게 바꾸고 있는지, 그 기술적 메커니즘을 파헤쳐 봅니다.
@@ -53,7 +53,9 @@ status: draft
 
 데이터센터에서 보았던 HBM(고대역폭 메모리)의 시대가 이제는 우리 개인용 기기에서도 본격적으로 개화하고 있는 셈입니다.
 
-### CPU와 GPU의 동거, 메모리 — 시장의 새로운 규칙
+### CPU와 GPU의 동거, 메모리 —
+
+시장의 새로운 규칙
 
 지금 반도체 시장에서 벌어지는 일들은 과거와 전혀 다른 양상을 보입니다. 엔비디아가 새롭게 선보인 ‘베라 루빈’과 같은 차세대 가속기 아키텍처를 살펴보면, CPU와 GPU의 관계가 이전과는 완전히 달라졌음을 알 수 있습니다.
 

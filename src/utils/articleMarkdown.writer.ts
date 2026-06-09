@@ -4,6 +4,7 @@ import type { GeneratedArticle } from "../types/article.types.js";
 import type { ParsedEmail } from "../types/email.types.js";
 import type { ExtractedTopic } from "../types/topic.types.js";
 import { layoutArticleBody } from "./articleBody.formatter.js";
+import { sanitizeHighlights } from "./articleContent.validate.js";
 
 function escapeYaml(value: string): string {
   return value.replace(/"/g, "'");
@@ -35,9 +36,12 @@ export function writeArticleMarkdown(
   }
 ): void {
   const mi = article.marketInfo;
-  const bodyText = layoutArticleBody(article.text);
+  const bodyText = layoutArticleBody(article.text, { relayout: true });
   const bodyChars = countBodyChars(bodyText);
-  const highlights = article.highlights ?? [];
+  const highlights = sanitizeHighlights(article.highlights ?? [], {
+    description: article.description,
+    body: bodyText,
+  });
 
   const lines = [
     "---",

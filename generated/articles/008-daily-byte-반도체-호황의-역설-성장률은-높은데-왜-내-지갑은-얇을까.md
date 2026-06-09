@@ -17,7 +17,7 @@ categorySlug: economy
 writingStyle: 질문으로 시작하는 칼럼 — 독자의 일상 경험에서 출발해 거시 이슈로 확장
 date: 2026.06.01
 readMinutes: 3
-imageUrl: /api/media/images/19e7fc4aae020b39-t0.jpg
+imageUrl: 'https://images.unsplash.com/photo-1618044733300-9472054094ee?v=1780973006472'
 marketInfo:
   kospi: '2700'
   kosdaq: '850'

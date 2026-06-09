@@ -15,7 +15,7 @@ categorySlug: economy
 writingStyle: 이슈 뒤 숨은 구조를 파헤치는 분석 — 겉 뉴스 너머의 메커니즘
 date: 2026.06.04
 readMinutes: 3
-imageUrl: /api/media/images/19e8f273f1b13541-t3.jpg
+imageUrl: 'https://images.unsplash.com/photo-1649003515353-c58a239cf662?v=1780973006478'
 marketInfo:
   kospi: '8801.49'
   kosdaq: '1026.03'

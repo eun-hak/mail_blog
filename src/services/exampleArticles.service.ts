@@ -1,7 +1,9 @@
 import type { GeneratedArticle } from "../types/article.types.js";
 import {
+  getGeneratedArticlesDir,
   listExampleMarkdownFiles,
   parseMarkdownArticleFile,
+  sortArticlesByRecency,
 } from "../utils/markdownArticle.parser.js";
 
 export type ExampleArticlesResult = {
@@ -12,11 +14,14 @@ export type ExampleArticlesResult = {
 
 export function loadExampleArticles(): ExampleArticlesResult {
   const files = listExampleMarkdownFiles();
-  const articles = files.map((file) => parseMarkdownArticleFile(file));
+  const articles = sortArticlesByRecency(
+    files.map((file) => parseMarkdownArticleFile(file))
+  );
+  const fromGenerated = files.some((f) => f.includes(`${getGeneratedArticlesDir()}`));
 
   return {
     articles,
     source: "example",
-    directory: "example/articles",
+    directory: fromGenerated ? "generated/articles" : "example/articles",
   };
 }
